@@ -5,6 +5,7 @@ dist/
 
 # Secrets & tokens — ne jamais commit
 .env
+.mcp.json
 tokens.json
 client_secret*.json
 
