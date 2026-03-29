@@ -6,6 +6,8 @@
 
 Gerez vos videos, playlists, commentaires, sous-titres et votre chaine directement depuis Claude.
 
+A l'origine, j'ai cree cet outil pour gerer ma propre chaine gaming [Descloizite](https://www.youtube.com/@Descloizite). En tant que createur, je voulais pouvoir piloter ma chaine directement depuis Claude sans quitter mon workflow. Le projet est ouvert a tous les createurs YouTube qui souhaitent faire de meme.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -156,7 +158,30 @@ npm install
 npm run build
 ```
 
-### 3. Configurer Claude Desktop
+### 3. Configurer Claude
+
+#### Option A — Claude Code (CLI / VS Code / JetBrains)
+
+Creez un fichier `.mcp.json` a la racine du projet :
+
+```json
+{
+  "mcpServers": {
+    "claudetube": {
+      "command": "node",
+      "args": ["/chemin/vers/ClaudeTube/dist/index.js"],
+      "env": {
+        "YOUTUBE_CLIENT_ID": "votre-client-id.apps.googleusercontent.com",
+        "YOUTUBE_CLIENT_SECRET": "votre-client-secret"
+      }
+    }
+  }
+}
+```
+
+Ajoutez `.mcp.json` a votre `.gitignore` pour ne pas exposer vos secrets.
+
+#### Option B — Claude Desktop
 
 Ajoutez la configuration suivante dans votre fichier `claude_desktop_config.json` :
 
@@ -177,7 +202,7 @@ Ajoutez la configuration suivante dans votre fichier `claude_desktop_config.json
 
 ### 4. Connexion
 
-Apres le redemarrage de Claude Desktop, demandez simplement :
+Apres le redemarrage de Claude, demandez simplement :
 
 > "Connecte-toi a mon compte YouTube"
 
@@ -240,6 +265,8 @@ src/
 **MCP Server to connect Claude to your YouTube account.**
 
 Manage your videos, playlists, comments, captions, and channel directly from Claude.
+
+I originally built this tool to manage my own gaming channel [Descloizite](https://www.youtube.com/@Descloizite). As a creator, I wanted to control my channel directly from Claude without leaving my workflow. The project is open to all YouTube creators who want to do the same.
 
 </div>
 
@@ -381,7 +408,30 @@ npm install
 npm run build
 ```
 
-### 3. Configure Claude Desktop
+### 3. Configure Claude
+
+#### Option A — Claude Code (CLI / VS Code / JetBrains)
+
+Create a `.mcp.json` file at the root of your project:
+
+```json
+{
+  "mcpServers": {
+    "claudetube": {
+      "command": "node",
+      "args": ["/path/to/ClaudeTube/dist/index.js"],
+      "env": {
+        "YOUTUBE_CLIENT_ID": "your-client-id.apps.googleusercontent.com",
+        "YOUTUBE_CLIENT_SECRET": "your-client-secret"
+      }
+    }
+  }
+}
+```
+
+Add `.mcp.json` to your `.gitignore` to keep your secrets safe.
+
+#### Option B — Claude Desktop
 
 Add the following to your `claude_desktop_config.json` file:
 
@@ -402,7 +452,7 @@ Add the following to your `claude_desktop_config.json` file:
 
 ### 4. Connect
 
-After restarting Claude Desktop, simply ask:
+After restarting Claude, simply ask:
 
 > "Connect to my YouTube account"
 
