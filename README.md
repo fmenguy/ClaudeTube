@@ -2,11 +2,11 @@
 
 # ClaudeTube
 
-**Serveur MCP pour connecter Claude a votre compte YouTube.**
+**Serveur MCP pour connecter Claude à votre compte YouTube.**
 
-Gerez vos videos, playlists, commentaires, sous-titres et votre chaine directement depuis Claude.
+Gérez vos vidéos, playlists, commentaires, sous-titres et votre chaîne directement depuis Claude.
 
-A l'origine, j'ai cree cet outil pour gerer ma propre chaine gaming [Descloizite](https://www.youtube.com/@Descloizite). En tant que createur, je voulais pouvoir piloter ma chaine directement depuis Claude sans quitter mon workflow. Le projet est ouvert a tous les createurs YouTube qui souhaitent faire de meme.
+À l'origine, j'ai créé cet outil pour gérer ma propre chaîne gaming [Descloizite](https://www.youtube.com/@Descloizite). En tant que créateur, je voulais pouvoir piloter ma chaîne directement depuis Claude sans quitter mon workflow. Le projet est ouvert à tous les créateurs YouTube qui souhaitent faire de même.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -16,7 +16,7 @@ A l'origine, j'ai cree cet outil pour gerer ma propre chaine gaming [Descloizite
 
 <br/>
 
-[Francais](#installation) | [English](#english)
+[Français](#installation) | [English](#english)
 
 </div>
 
@@ -32,39 +32,39 @@ A l'origine, j'ai cree cet outil pour gerer ma propre chaine gaming [Descloizite
 | API | YouTube Data API v3 via `googleapis` |
 | Authentification | OAuth 2.0 avec refresh automatique |
 | Chiffrement | AES-256-GCM (tokens au repos) |
-| Validation | Zod (schemas runtime) |
+| Validation | Zod (schémas runtime) |
 
-## Securite
+## Sécurité
 
-ClaudeTube est concu avec la securite comme priorite. Aucun compromis.
+ClaudeTube est conçu avec la sécurité comme priorité. Aucun compromis.
 
-| Mesure | Detail |
+| Mesure | Détail |
 |--------|--------|
-| **OAuth 2.0** | Protocole standard. Aucun mot de passe YouTube n'est manipule. |
-| **Chiffrement AES-256-GCM** | Les tokens sont chiffres au repos avec un IV aleatoire par operation et verification d'integrite via authentication tag. |
-| **Aucun serveur distant** | Le serveur MCP tourne exclusivement en local. Les donnees transitent uniquement entre votre machine et l'API Google. |
-| **Scopes minimaux** | Seuls les scopes YouTube strictement necessaires sont demandes lors de l'autorisation. |
-| **Confirmation explicite** | Toute action destructive (suppression de video, playlist, commentaire) exige un parametre `confirm: true`. |
-| **Validation des entrees** | Les identifiants YouTube sont valides par regex avant tout appel API. Les textes sont sanitises (caracteres de controle supprimes). |
-| **Permissions fichiers** | Le repertoire de tokens est cree en `0700`, les fichiers en `0600`. |
+| **OAuth 2.0** | Protocole standard. Aucun mot de passe YouTube n'est manipulé. |
+| **Chiffrement AES-256-GCM** | Les tokens sont chiffrés au repos avec un IV aléatoire par opération et vérification d'intégrité via authentication tag. |
+| **Aucun serveur distant** | Le serveur MCP tourne exclusivement en local. Les données transitent uniquement entre votre machine et l'API Google. |
+| **Scopes minimaux** | Seuls les scopes YouTube strictement nécessaires sont demandés lors de l'autorisation. |
+| **Confirmation explicite** | Toute action destructive (suppression de vidéo, playlist, commentaire) exige un paramètre `confirm: true`. |
+| **Validation des entrées** | Les identifiants YouTube sont validés par regex avant tout appel API. Les textes sont sanitisés (caractères de contrôle supprimés). |
+| **Permissions fichiers** | Le répertoire de tokens est créé en `0700`, les fichiers en `0600`. |
 
 <details>
 <summary><strong>Architecture de chiffrement</strong></summary>
 
 ```
-Cle source (env var ou derivee du homedir)
+Clé source (env var ou dérivée du homedir)
     |
     v
-SHA-256 → Cle AES-256 (32 bytes)
+SHA-256 → Clé AES-256 (32 bytes)
     |
     v
 Chiffrement AES-256-GCM
-    - IV aleatoire (16 bytes) par operation
-    - Authentication tag (16 bytes) pour l'integrite
-    - Resultat stocke en JSON : { iv, tag, data }
+    - IV aléatoire (16 bytes) par opération
+    - Authentication tag (16 bytes) pour l'intégrité
+    - Résultat stocké en JSON : { iv, tag, data }
 ```
 
-Les tokens ne sont jamais ecrits en clair sur le disque.
+Les tokens ne sont jamais écrits en clair sur le disque.
 
 </details>
 
@@ -74,19 +74,19 @@ Les tokens ne sont jamais ecrits en clair sur le disque.
 
 | Outil | Description |
 |-------|-------------|
-| `auth` | Genere l'URL d'autorisation OAuth 2.0 |
+| `auth` | Génère l'URL d'autorisation OAuth 2.0 |
 | `auth_callback` | Finalise la connexion avec le code d'autorisation |
-| `auth_status` | Verifie l'etat de connexion et affiche les infos de la chaine |
-| `auth_revoke` | Deconnecte et supprime les tokens stockes |
+| `auth_status` | Vérifie l'état de connexion et affiche les infos de la chaîne |
+| `auth_revoke` | Déconnecte et supprime les tokens stockés |
 
-### Videos
+### Vidéos
 
 | Outil | Description |
 |-------|-------------|
-| `list_my_videos` | Liste les videos de votre chaine (titre, stats, statut) |
-| `get_video` | Details complets d'une video (metadata, stats, tags) |
-| `update_video` | Modifie titre, description, tags, categorie, confidentialite |
-| `delete_video` | Supprime une video (confirmation requise) |
+| `list_my_videos` | Liste les vidéos de votre chaîne (titre, stats, statut) |
+| `get_video` | Détails complets d'une vidéo (metadata, stats, tags) |
+| `update_video` | Modifie titre, description, tags, catégorie, confidentialité |
+| `delete_video` | Supprime une vidéo (confirmation requise) |
 | `rate_video` | Like, dislike ou retire une note |
 
 ### Playlists
@@ -94,58 +94,58 @@ Les tokens ne sont jamais ecrits en clair sur le disque.
 | Outil | Description |
 |-------|-------------|
 | `list_my_playlists` | Liste toutes vos playlists |
-| `create_playlist` | Cree une nouvelle playlist |
-| `update_playlist` | Modifie titre, description, confidentialite |
+| `create_playlist` | Crée une nouvelle playlist |
+| `update_playlist` | Modifie titre, description, confidentialité |
 | `delete_playlist` | Supprime une playlist (confirmation requise) |
-| `list_playlist_items` | Liste les videos d'une playlist |
-| `add_to_playlist` | Ajoute une video a une playlist |
-| `remove_from_playlist` | Retire une video d'une playlist |
+| `list_playlist_items` | Liste les vidéos d'une playlist |
+| `add_to_playlist` | Ajoute une vidéo à une playlist |
+| `remove_from_playlist` | Retire une vidéo d'une playlist |
 
 ### Commentaires
 
 | Outil | Description |
 |-------|-------------|
-| `list_comments` | Liste les commentaires d'une video |
-| `post_comment` | Poste un commentaire sur une video |
-| `reply_to_comment` | Repond a un commentaire existant |
+| `list_comments` | Liste les commentaires d'une vidéo |
+| `post_comment` | Poste un commentaire sur une vidéo |
+| `reply_to_comment` | Répond à un commentaire existant |
 | `delete_comment` | Supprime un commentaire (confirmation requise) |
 | `moderate_comment` | Approuve, rejette ou marque comme spam |
 
-### Chaine
+### Chaîne
 
 | Outil | Description |
 |-------|-------------|
-| `get_my_channel` | Informations completes de votre chaine |
-| `update_my_channel` | Modifie description, mots-cles, langue, pays |
+| `get_my_channel` | Informations complètes de votre chaîne |
+| `update_my_channel` | Modifie description, mots-clés, langue, pays |
 
 ### Sous-titres
 
 | Outil | Description |
 |-------|-------------|
-| `list_captions` | Liste les sous-titres d'une video |
-| `download_caption` | Telecharge un sous-titre (SRT, SBV, VTT) |
+| `list_captions` | Liste les sous-titres d'une vidéo |
+| `download_caption` | Télécharge un sous-titre (SRT, SBV, VTT) |
 | `delete_caption` | Supprime un sous-titre (confirmation requise) |
 
 ### Recherche
 
 | Outil | Description |
 |-------|-------------|
-| `search_youtube` | Recherche videos, chaines ou playlists sur YouTube |
+| `search_youtube` | Recherche vidéos, chaînes ou playlists sur YouTube |
 
 ## Installation
 
-### Prerequis
+### Prérequis
 
-- Node.js 18 ou superieur
-- Un projet Google Cloud avec l'API YouTube Data v3 activee
+- Node.js 18 ou supérieur
+- Un projet Google Cloud avec l'API YouTube Data v3 activée
 - Des identifiants OAuth 2.0 (type "Application de bureau")
 
-### 1. Creer les identifiants Google
+### 1. Créer les identifiants Google
 
-1. Accedez a [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-2. Creez un projet ou selectionnez un projet existant
-3. Activez l'**API YouTube Data v3** dans la [bibliotheque d'API](https://console.cloud.google.com/apis/library/youtube.googleapis.com)
-4. Allez dans **Identifiants** > **Creer des identifiants** > **ID client OAuth 2.0**
+1. Accédez à [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Créez un projet ou sélectionnez un projet existant
+3. Activez l'**API YouTube Data v3** dans la [bibliothèque d'API](https://console.cloud.google.com/apis/library/youtube.googleapis.com)
+4. Allez dans **Identifiants** > **Créer des identifiants** > **ID client OAuth 2.0**
 5. Type d'application : **Application de bureau**
 6. Notez le `Client ID` et le `Client Secret`
 
@@ -162,7 +162,7 @@ npm run build
 
 #### Option A — Claude Code (CLI / VS Code / JetBrains)
 
-Creez un fichier `.mcp.json` a la racine du projet :
+Créez un fichier `.mcp.json` à la racine du projet :
 
 ```json
 {
@@ -179,7 +179,7 @@ Creez un fichier `.mcp.json` a la racine du projet :
 }
 ```
 
-Ajoutez `.mcp.json` a votre `.gitignore` pour ne pas exposer vos secrets.
+Ajoutez `.mcp.json` à votre `.gitignore` pour ne pas exposer vos secrets.
 
 #### Option B — Claude Desktop
 
@@ -202,11 +202,11 @@ Ajoutez la configuration suivante dans votre fichier `claude_desktop_config.json
 
 ### 4. Connexion
 
-Apres le redemarrage de Claude, demandez simplement :
+Après le redémarrage de Claude, demandez simplement :
 
-> "Connecte-toi a mon compte YouTube"
+> "Connecte-toi à mon compte YouTube"
 
-Claude generera un lien d'autorisation via l'outil `auth`, puis finalisera la connexion avec `auth_callback`. Les tokens sont chiffres et stockes localement.
+Claude génèrera un lien d'autorisation via l'outil `auth`, puis finalisera la connexion avec `auth_callback`. Les tokens sont chiffrés et stockés localement.
 
 ## Variables d'environnement
 
@@ -214,26 +214,26 @@ Claude generera un lien d'autorisation via l'outil `auth`, puis finalisera la co
 |----------|--------|-------------|
 | `YOUTUBE_CLIENT_ID` | Oui | Client ID OAuth 2.0 Google |
 | `YOUTUBE_CLIENT_SECRET` | Oui | Client Secret OAuth 2.0 Google |
-| `YOUTUBE_REDIRECT_URI` | Non | URI de redirection (defaut : `urn:ietf:wg:oauth:2.0:oob`) |
-| `CLAUDETUBE_TOKEN_PATH` | Non | Chemin de stockage des tokens chiffres (defaut : `~/.claudetube/tokens.enc`) |
-| `CLAUDETUBE_ENCRYPTION_KEY` | Non | Cle de chiffrement personnalisee pour les tokens |
+| `YOUTUBE_REDIRECT_URI` | Non | URI de redirection (défaut : `urn:ietf:wg:oauth:2.0:oob`) |
+| `CLAUDETUBE_TOKEN_PATH` | Non | Chemin de stockage des tokens chiffrés (défaut : `~/.claudetube/tokens.enc`) |
+| `CLAUDETUBE_ENCRYPTION_KEY` | Non | Clé de chiffrement personnalisée pour les tokens |
 
 ## Exemples d'utilisation
 
 ```
-"Liste mes 5 dernieres videos"
+"Liste mes 5 dernières vidéos"
 → list_my_videos(maxResults: 5)
 
-"Mets la video dQw4w9WgXcQ en non-repertorie"
+"Mets la vidéo dQw4w9WgXcQ en non-répertorié"
 → update_video(videoId: "dQw4w9WgXcQ", privacyStatus: "unlisted")
 
-"Cree une playlist 'Best of 2024' et ajoutes-y ces 3 videos"
+"Crée une playlist 'Best of 2024' et ajoutes-y ces 3 vidéos"
 → create_playlist + add_to_playlist x3
 
-"Reponds 'Merci !' aux 5 derniers commentaires sur ma video"
+"Réponds 'Merci !' aux 5 derniers commentaires sur ma vidéo"
 → list_comments + reply_to_comment x5
 
-"Quels sous-titres sont disponibles sur ma derniere video ?"
+"Quels sous-titres sont disponibles sur ma dernière vidéo ?"
 → list_my_videos(maxResults: 1) + list_captions
 ```
 
@@ -241,19 +241,19 @@ Claude generera un lien d'autorisation via l'outil `auth`, puis finalisera la co
 
 ```
 src/
-├── index.ts              Point d'entree MCP, enregistrement des outils
+├── index.ts              Point d'entrée MCP, enregistrement des outils
 ├── auth/
 │   └── oauth.ts          OAuth 2.0 flow, chiffrement et stockage des tokens
 ├── tools/
-│   ├── videos.ts         Gestion des videos (CRUD + rating)
+│   ├── videos.ts         Gestion des vidéos (CRUD + rating)
 │   ├── playlists.ts      Gestion des playlists (CRUD + items)
-│   ├── comments.ts       Commentaires (CRUD + moderation)
-│   ├── channel.ts        Informations et modification de la chaine
+│   ├── comments.ts       Commentaires (CRUD + modération)
+│   ├── channel.ts        Informations et modification de la chaîne
 │   ├── captions.ts       Sous-titres (list, download, delete)
 │   └── search.ts         Recherche YouTube
 └── utils/
-    ├── errors.ts         Gestion d'erreurs API centralisee
-    └── validation.ts     Validation et sanitisation des entrees
+    ├── errors.ts         Gestion d'erreurs API centralisée
+    └── validation.ts     Validation et sanitisation des entrées
 ```
 
 ---
