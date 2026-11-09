@@ -16,7 +16,7 @@
 </div>
 
 > [!WARNING]
-> **Projet archivé.** ClaudeTube n'est plus maintenu. Le code reste en ligne, en lecture seule, pour qui veut s'en inspirer ou le reprendre : aucune correction ni évolution n'est prévue, et les dépendances ne sont plus mises à jour.
+> **Projet archivé.** ClaudeTube n'est plus maintenu. Le code reste en ligne, en lecture seule, pour qui veut s'en inspirer ou le reprendre. Une dernière passe de sécurité a été faite en novembre 2026 (portée OAuth réduite, connexion par boucle locale, clé de chiffrement aléatoire) ; aucune autre évolution n'est prévue, et les dépendances ne sont plus mises à jour.
 
 ClaudeTube est un serveur MCP local qui relie Claude à l'API YouTube Data v3 par OAuth 2.0. Il expose 27 outils pour gérer ses vidéos, playlists, commentaires, sous-titres et sa chaîne depuis une conversation, sans passer par YouTube Studio.
 
@@ -310,7 +310,7 @@ Auteur : François Menguy, [fmenguy.fr](https://fmenguy.fr).
 </div>
 
 > [!WARNING]
-> **Archived project.** ClaudeTube is no longer maintained. The code stays online, read only, for anyone who wants to study or fork it: no fixes or new features are planned, and dependencies are no longer updated.
+> **Archived project.** ClaudeTube is no longer maintained. The code stays online, read only, for anyone who wants to study or fork it. A final security pass was made in November 2026 (narrower OAuth scope, loopback sign-in, random encryption key); no further changes are planned, and dependencies are no longer updated.
 
 ClaudeTube is a local MCP server that connects Claude to the YouTube Data API v3 through OAuth 2.0. It exposes 27 tools to manage your videos, playlists, comments, captions and channel from a conversation, without opening YouTube Studio.
 
