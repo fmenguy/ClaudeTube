@@ -1,7 +1,7 @@
 {
   "name": "claudetube",
   "version": "1.0.0",
-  "description": "MCP Server for YouTube — Manage your channel directly from Claude",
+  "description": "MCP Server for YouTube: manage your channel directly from Claude",
   "main": "dist/index.js",
   "type": "module",
   "bin": {

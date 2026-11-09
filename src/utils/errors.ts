@@ -9,14 +9,14 @@ import { GaxiosError } from "googleapis-common";
 
 // Mapping des codes d'erreur HTTP vers des messages clairs
 const ERROR_MESSAGES: Record<number, string> = {
-  400: "Requête invalide — vérifie les paramètres envoyés.",
-  401: "Non authentifié — reconnecte-toi avec l'outil 'auth'.",
-  403: "Accès refusé — ton compte n'a pas les permissions nécessaires pour cette action.",
-  404: "Ressource introuvable — vérifie l'identifiant fourni.",
-  409: "Conflit — cette ressource existe déjà ou a été modifiée.",
-  429: "Trop de requêtes — quota YouTube API dépassé, réessaie plus tard.",
-  500: "Erreur interne YouTube — réessaie dans quelques instants.",
-  503: "Service YouTube temporairement indisponible — réessaie plus tard.",
+  400: "Requête invalide : vérifie les paramètres envoyés.",
+  401: "Non authentifié : reconnecte-toi avec l'outil 'auth'.",
+  403: "Accès refusé : ton compte n'a pas les permissions nécessaires pour cette action.",
+  404: "Ressource introuvable : vérifie l'identifiant fourni.",
+  409: "Conflit : cette ressource existe déjà ou a été modifiée.",
+  429: "Trop de requêtes : quota YouTube API dépassé, réessaie plus tard.",
+  500: "Erreur interne YouTube : réessaie dans quelques instants.",
+  503: "Service YouTube temporairement indisponible : réessaie plus tard.",
 };
 
 export interface FormattedError {

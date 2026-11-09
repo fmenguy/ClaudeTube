@@ -1,4 +1,4 @@
-# Comment est construit ClaudeTube — Guide pédagogique
+# Comment est construit ClaudeTube : guide pédagogique
 
 Ce document explique pas à pas comment le serveur MCP ClaudeTube est conçu, pour
 quelqu'un qui voudrait comprendre le fonctionnement interne ou créer son propre
@@ -123,14 +123,14 @@ server.tool(
 
 Décortiquons :
 
-1. **Le nom** (`"search_youtube"`) — C'est ce que Claude utilise pour appeler l'outil
-2. **La description** — Claude la lit pour décider quel outil utiliser. Elle doit
+1. **Le nom** (`"search_youtube"`) : c'est ce que Claude utilise pour appeler l'outil
+2. **La description** : Claude la lit pour décider quel outil utiliser. Elle doit
    être claire et précise. Si tu dis "liste mes vidéos", Claude va chercher un
    outil dont la description mentionne "lister" et "vidéos".
-3. **Le schéma Zod** — Définit les paramètres que Claude doit fournir. Zod valide
+3. **Le schéma Zod** : définit les paramètres que Claude doit fournir. Zod valide
    automatiquement les types, les contraintes (min, max), et génère les valeurs
    par défaut. Claude voit aussi les `.describe()` pour comprendre chaque paramètre.
-4. **La fonction** — C'est le code qui s'exécute quand Claude appelle l'outil.
+4. **La fonction** : c'est le code qui s'exécute quand Claude appelle l'outil.
    Elle reçoit les paramètres validés et doit retourner un objet `{ content: [...] }`.
 
 Le retour est toujours un tableau de contenus. Ici on retourne du texte JSON,
@@ -148,22 +148,31 @@ pour accéder aux données d'un utilisateur. Voici le flow complet :
     ↓
 Étape 2 : Claude appelle l'outil "auth"
     ↓
-Étape 3 : ClaudeTube génère une URL d'autorisation Google
+Étape 3 : ClaudeTube ouvre un serveur HTTP éphémère sur 127.0.0.1 (port libre)
+          et génère une URL d'autorisation Google (PKCE + paramètre state)
     ↓
 Étape 4 : L'utilisateur visite l'URL, autorise l'accès
     ↓
-Étape 5 : Google affiche un code d'autorisation
+Étape 5 : Google renvoie le navigateur vers http://127.0.0.1:<port>/?state=...&code=...
     ↓
-Étape 6 : L'utilisateur donne le code à Claude
+Étape 6 : Le serveur local vérifie le state et récupère le code tout seul
     ↓
-Étape 7 : Claude appelle "auth_callback" avec le code
+Étape 7 : ClaudeTube échange le code (et le vérificateur PKCE) contre des tokens
     ↓
-Étape 8 : ClaudeTube échange le code contre des tokens
+Étape 8 : Les tokens sont chiffrés et sauvegardés, le serveur local se ferme
     ↓
-Étape 9 : Les tokens sont chiffrés et sauvegardés
-    ↓
-Étape 10 : Toutes les requêtes suivantes utilisent ces tokens
+Étape 9 : Toutes les requêtes suivantes utilisent ces tokens
 ```
+
+Si le navigateur ne peut pas joindre le serveur local (serveur MCP sur une
+autre machine, délai de 10 minutes dépassé), l'utilisateur copie l'adresse de
+la page de retour et Claude la passe à l'outil `auth_callback`, qui fait le
+même échange. C'est aussi le seul chemin quand `YOUTUBE_REDIRECT_URI` est
+définie.
+
+Une seule portée est demandée, `youtube.force-ssl` : c'est la seule
+qu'acceptent les méthodes des commentaires et des sous-titres, et elle couvre
+tous les autres appels.
 
 ### Les tokens
 
@@ -188,12 +197,18 @@ Texte clair (tokens JSON)
     ↓
 Générer un IV aléatoire (16 bytes)
     ↓
-Chiffrer avec AES-256-GCM (clé dérivée via SHA-256)
+Chiffrer avec AES-256-GCM
     ↓
 Récupérer le tag d'authentification (16 bytes)
     ↓
 Stocker { iv, tag, data } dans ~/.claudetube/tokens.enc
 ```
+
+La clé AES vient de `CLAUDETUBE_ENCRYPTION_KEY` (son empreinte SHA-256) si la
+variable est définie, sinon d'un fichier `encryption.key` (32 octets
+aléatoires, permissions 0600) créé à côté des tokens au premier enregistrement.
+Des tokens chiffrés avec l'ancienne clé par défaut, dérivée du dossier
+personnel, sont relus puis rechiffrés automatiquement.
 
 **AES-256-GCM** est un algorithme de chiffrement authentifié. "Authentifié"
 signifie qu'en plus de chiffrer les données, il génère un tag qui prouve que
@@ -218,7 +233,7 @@ traduit en messages compréhensibles.
 
 // Après (erreur formatée par ClaudeTube) :
 {
-  error: "Trop de requêtes — quota YouTube API dépassé, réessaie plus tard.",
+  error: "Trop de requêtes : quota YouTube API dépassé, réessaie plus tard.",
   code: 429,
   details: "quotaExceeded"
 }
@@ -309,8 +324,8 @@ await server.connect(transport);
 ```
 
 Les dépendances nécessaires :
-- `@modelcontextprotocol/sdk` — Le SDK MCP
-- `zod` — La validation des paramètres
+- `@modelcontextprotocol/sdk` : le SDK MCP
+- `zod` : la validation des paramètres
 - Le client de ton API (ici `googleapis` pour YouTube)
 
 La configuration dans `.mcp.json` ou `claude_desktop_config.json` indique à

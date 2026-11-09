@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * ClaudeTube — MCP Server pour YouTube
+ * ClaudeTube : MCP Server pour YouTube
  *
  * Point d'entrée principal du serveur MCP.
  * Initialise l'authentification OAuth2, enregistre tous les outils
@@ -21,7 +21,7 @@ import { z } from "zod";
 
 import {
   createOAuth2Client,
-  getAuthUrl,
+  startAuthorization,
   exchangeCode,
   initializeAuth,
   getYouTubeClient,
@@ -64,7 +64,7 @@ async function main() {
   try {
     oauth2Client = createOAuth2Client();
   } catch (err) {
-    // Les variables d'environnement manquent — on démarre quand même
+    // Les variables d'environnement manquent : on démarre quand même
     // mais les outils renverront des erreurs claires
     console.error(
       `[ClaudeTube] ⚠️ ${err instanceof Error ? err.message : err}`
@@ -151,7 +151,7 @@ async function main() {
   // --- Démarrer l'authentification ---
   server.tool(
     "auth",
-    "Génère l'URL d'autorisation YouTube. Visite cette URL, autorise l'accès, puis utilise 'auth_callback' avec le code reçu.",
+    "Génère l'URL d'autorisation YouTube. Par défaut, un serveur local éphémère reçoit le code et termine la connexion tout seul ; sinon, utilise 'auth_callback' avec l'adresse de retour ou le code reçu.",
     {},
     async () => {
       if (!oauth2Client) {
@@ -169,7 +169,38 @@ async function main() {
         };
       }
 
-      const url = getAuthUrl(oauth2Client);
+      let start;
+      try {
+        start = await startAuthorization(oauth2Client, () => {
+          youtubeClient = getYouTubeClient(oauth2Client);
+          isAuthenticated = true;
+          console.error("[ClaudeTube] Connecté à YouTube (retour du navigateur reçu).");
+        });
+      } catch (err) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({
+                error: `Impossible de démarrer l'autorisation : ${err instanceof Error ? err.message : err}`,
+              }),
+            },
+          ],
+        };
+      }
+
+      const next =
+        start.mode === "loopback"
+          ? "Ouvre cette URL et autorise l'accès. Google renvoie ensuite le navigateur vers " +
+            start.redirectUri +
+            ", où ClaudeTube récupère le code tout seul (page « ClaudeTube est connecté »). " +
+            "Vérifie ensuite avec 'auth_status'. Le serveur local attend 10 minutes. " +
+            "Si la page de retour ne s'affiche pas, copie l'adresse complète de la barre du navigateur et passe-la à 'auth_callback'."
+          : "Ouvre cette URL et autorise l'accès. Google renvoie ensuite le navigateur vers " +
+            start.redirectUri +
+            " (une page d'erreur est normale si rien n'écoute à cette adresse). " +
+            "Copie l'adresse complète de la barre du navigateur, ou la seule valeur du paramètre code, et passe-la à 'auth_callback'.";
+
       return {
         content: [
           {
@@ -177,8 +208,8 @@ async function main() {
             text: JSON.stringify(
               {
                 action: "Visite cette URL pour autoriser ClaudeTube :",
-                url,
-                next: "Copie le code d'autorisation et utilise l'outil 'auth_callback' pour terminer la connexion.",
+                url: start.url,
+                next,
               },
               null,
               2
@@ -192,12 +223,12 @@ async function main() {
   // --- Finaliser l'authentification ---
   server.tool(
     "auth_callback",
-    "Finalise la connexion YouTube avec le code d'autorisation obtenu après avoir visité l'URL.",
+    "Finalise la connexion YouTube à la main, quand le retour automatique n'a pas abouti : accepte l'adresse complète de la page de retour ou le code d'autorisation seul.",
     {
       code: z
         .string()
         .min(1)
-        .describe("Code d'autorisation reçu de Google"),
+        .describe("Adresse complète de la page de retour (copiée depuis la barre du navigateur) ou code d'autorisation seul"),
     },
     async ({ code }) => {
       if (!oauth2Client) {
@@ -316,7 +347,7 @@ async function main() {
 
   // Log sur stderr pour ne pas interférer avec le protocole MCP (qui utilise stdout)
   console.error(
-    `[ClaudeTube] Serveur MCP démarré${isAuthenticated ? " (authentifié)" : " (non authentifié — utilise l'outil 'auth')"}`
+    `[ClaudeTube] Serveur MCP démarré${isAuthenticated ? " (authentifié)" : " (non authentifié, utilise l'outil 'auth')"}`
   );
 }
 
